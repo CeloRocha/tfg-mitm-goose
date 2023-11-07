@@ -14,7 +14,7 @@ class ASNType(object):
     def pack(self, data):
         raise NotImplemented()
 
-    def spoof(self):
+    def spoof(self, data=False):
         return self.data
 
     def __str__(self):
@@ -35,7 +35,8 @@ class Integer(ASNType):
             elif self.data <= 65535:
                 return struct.pack('!h', self.data)
             else:
-                return struct.pack('!i', self.data)
+                return self.data.to_bytes(5)
+                #return struct.pack('!i', self.data)
         if isinstance(self.data, long):
             return struct.pack('!l', self.data)
 
@@ -101,10 +102,12 @@ class UnsignedInteger(ASNType):
 
 class Float(ASNType):
     def __init__(self, data='', length=0):
-        self.data = struct.unpack('!f', data)[0]
+        #self.data = struct.unpack('!f', data)[0]
+        self.data = data
 
     def pack(self):
-        return struct.data('!f', data) 
+        #return struct.data('!f', data) 
+        return self.data
 
 class Real(Float):
     pass
@@ -116,22 +119,26 @@ class OctetString(ASNType):
 class BitString(ASNType):
     ID = 4
     def __init__(self, data='', length=0):
-        c = {'0': '0000', '1': '0001', '2': '0010', 
-             '3':'0011', '4':'0100', '5':'0101', 
-             '6':'0110', '7':'0111', '8':'1000', 
-             '9':'1001', 'a':'1010', 'b':'1011', 
-             'c':'1100', 'd':'1101', 'e':'1110', 
-             'f':'1111'}
-        self.padding = struct.unpack('!h', '\x00'+data[:1])[0]
-        h = binascii.b2a_hex(data[1:])
-        self.data = ''
-        for i in h:
-            self.data += c[i]
+        # c = {'0': '0000', '1': '0001', '2': '0010', 
+        #      '3':'0011', '4':'0100', '5':'0101', 
+        #      '6':'0110', '7':'0111', '8':'1000', 
+        #      '9':'1001', 'a':'1010', 'b':'1011', 
+        #      'c':'1100', 'd':'1101', 'e':'1110', 
+        #      'f':'1111'}
+        # self.padding = struct.unpack('!h', '\x00'+data[:1])[0]
+        # h = binascii.b2a_hex(data[1:])
+        # self.data = ''
+        # for i in h:
+        #     self.data += c[i]
+
+        self.data = data
 
     def pack(self):
-        packed_padding = struct.pack('!B', self.padding)
-        packed_data = struct.pack('!h', int(self.data, 2))
-        return packed_padding + packed_data
+        # packed_padding = struct.pack('!B', self.padding)
+        # packed_data = struct.pack('!h', int(self.data, 2))
+        # return packed_padding + packed_data
+    
+        return self.data
 
 class ObjectID(ASNType):
     pass

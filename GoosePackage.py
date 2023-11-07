@@ -16,6 +16,15 @@ class GoosePackage:
         self.source = source
         self.destination = destination
         self.type = 35000
+    
+    def setSource(self, source):
+        self.source = source
+
+    def setDestination(self, destination):
+        self.destination = destination
+
+    def setType(self, type):
+        self.type = type
 
     def __setTime(self):
         current_time = datetime.utcnow()
@@ -58,14 +67,15 @@ class GoosePackage:
             content.spoof()
         return self.decodedData
 
-     def semantic(self):
+    def semantic(self):
         raise NotImplemented()
 
-    #  def highSequence(self):
-    #     raise NotImplemented()
+    def highSequence(self):
+        self.decodedData[self.dict['sqNum']].to(4294967295 - 1)
     
-    #  def highState(self):
-    #     raise NotImplemented()
+    def highState(self):
+        self.decodedData[self.dict['stNum']].to(4294967295 - 2)
+        self.decodedData[self.dict['sqNum']].to(0)
     
     #  def flooding(self):
     #     raise NotImplemented()

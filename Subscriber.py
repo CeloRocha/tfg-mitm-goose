@@ -52,4 +52,4 @@ class Subscriber:
         self.package.decodePackage(packet.load)
 
     def sniff(self):
-        sniff(filter=self.filter, iface=self.iface, prn = self.callback, store=0)
+        sniff(filter=self.filter, iface=self.iface, prn = self.callback, store=0, count=1)
