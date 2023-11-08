@@ -42,6 +42,12 @@ class Integer(ASNType):
         if isinstance(self.data, long):
             return struct.pack('!l', self.data)
 
+    def spoof(self, data=False):
+        if (self.data != 0):
+            self.data = 0
+        else:
+            self.data = 32
+
     def to(self, setpoint):
         self.data = setpoint
 
@@ -107,11 +113,17 @@ class Float(ASNType):
         self.data = struct.unpack('f', data[1:])[0]
 
     def pack(self):
-        
         res = bytearray()
         res.extend((8).to_bytes(1))
         res.extend(struct.pack('f', self.data))
         return res
+    
+    def spoof(self, data=False):
+        if (self.data != 0):
+            self.data = -self.data
+        else:
+            self.data = 32
+
 class Real(Float):
     pass
 

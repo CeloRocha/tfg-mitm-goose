@@ -9,6 +9,10 @@ def signal_handler(signal, frame):
 #Exits loop
 signal.signal(signal.SIGINT, signal_handler)
 
-mitm = MITM(3)
-
+# Spoof: 0
+# High Sequence: 1
+# High State: 2
+# Semantic: 3
+mitm = MITM()
+print("RUN")
 mitm.sniff();

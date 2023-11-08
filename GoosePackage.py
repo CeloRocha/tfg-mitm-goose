@@ -82,7 +82,7 @@ class GoosePackage:
         isSameSq = self.decodedData[self.dict['sqNum']] == self.firstPackage[self.dict['sqNum']]
 
         if isSameSt and isSameSq:
-            self.decodedData[self.dict['sqNum']].to(4294967295 - 15)
+            self.decodedData[self.dict['sqNum']].to(4294967295)
         
         self.decodedData = self.firstPackage
         return False
@@ -206,4 +206,3 @@ class GoosePackage:
         # print("reserved1: ", reserved1)
         # print("reserved2: ", reserved2)
         # print("bytesPduLength: ", bytes_pdu_length)
-    
