@@ -2,6 +2,7 @@ import struct
 import binascii
 from scapy.all import *
 from helper import *
+import random
 
 class ASNType(object):
     tag = ''
@@ -120,10 +121,13 @@ class Float(ASNType):
         return res
     
     def spoof(self, data=False):
-        if (self.data != 0):
-            self.data = -self.data
-        else:
-            self.data = 32
+        if data:
+            x = bytearray()
+            x.extend(random.randint(0, 255).to_bytes(1))
+            x.extend(random.randint(0, 255).to_bytes(1))
+            x.extend(random.randint(0, 255).to_bytes(1))
+            x.extend(random.randint(0, 255).to_bytes(1))
+            self.data = int.from_bytes(x, 'big')
 
 class Real(Float):
     pass
