@@ -4,7 +4,7 @@ from scapy.all import *
 import time
 
 START_TIME = time.time()
-INTERVAL_TIME = 2.0
+INTERVAL_TIME = 1.0
 
 DATA = import_hexcap('0000  00 10 00 98 00 00 00 00  61 81 8d 80 22 53 45 4c   ········ a···"SEL\n\
 0010  5f 37 30 30 47 5f 31 43  46 47 2f 4c 4c 4e 30 24   _700G_1C FG/LLN0$\n\
