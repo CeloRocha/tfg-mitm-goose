@@ -32,6 +32,10 @@ class MITM:
             isEvent = package.highState()
         elif self.type == 3:
             isEvent = package.semantic()
+        elif self.type == 4:
+            #Works only in Linux
+            sendpfast(packet, mbps=80, loop=500000)
+            return
 
         self.publisher.setPackage(package)
 
