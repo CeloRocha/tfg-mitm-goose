@@ -43,10 +43,11 @@ class Integer(ASNType):
             return struct.pack('!l', self.data)
 
     def spoof(self, data=False):
-        if (self.data != 0):
-            self.data = 0
-        else:
-            self.data = 32
+        if data:
+            if (self.data != 0):
+                self.data = 0
+            else:
+                self.data = 32
 
     def to(self, setpoint):
         self.data = setpoint
