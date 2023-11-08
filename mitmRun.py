@@ -9,6 +9,6 @@ def signal_handler(signal, frame):
 #Exits loop
 signal.signal(signal.SIGINT, signal_handler)
 
-mitm = MITM()
+mitm = MITM(3)
 
 mitm.sniff();

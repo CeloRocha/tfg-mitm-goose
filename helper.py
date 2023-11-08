@@ -78,17 +78,16 @@ def decoder(data, tagmap, ignore_errors=True, decode_as_list=True):
         # else:
         #     results[name] = val
 
-    print("results ", results)
     return results
     
-def float_to_binary(x):
+def float_to_binary(x, m = 32, n = 24):
     """Convert the float value x to a binary string of length m + n
     where the first m binary digits are the integer part and the last
     'n' binary digits are the fractional part of x.
     """
     
-    x_scaled = round(x * 2**24)
-    return '{:0{}b}'.format(x_scaled, 32 + 24)
+    x_scaled = round(x * 2**n)
+    return '{:0{}b}'.format(x_scaled, m + n)
 
 def binary_to_float(bstr):
     """Convert a binary string in the format given above to its float

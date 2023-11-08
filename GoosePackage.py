@@ -16,22 +16,28 @@ class GoosePackage:
         self.source = source
         self.destination = destination
         self.type = 35000
+        self.firstPackage = None
+        self.lastState = None
+        self.useFirstPackage = False
+
+    def setUseFirstPackage(self):
+        self.useFirstPackage = True
+
+    def setSource(self, source):
+        self.source = source
+
+    def setDestination(self, destination):
+        self.destination = destination
+
+    def setType(self, type):
+        self.type = type
 
     def __setTime(self):
-        current_time = datetime.utcnow()
         t = time.time();
-        # # ('Timestamp', (342940201L, 0L))
-        # print("Set utc", current_time)
-        # print("Set utc int", int(current_time.timestamp()))
-        # print("Set utc sec", int(current_time.timestamp()/1000))
-        # print("Set utc int", int(current_time.timestamp()*1000))
         self.decodedData[self.dict['t']].to(t) 
 
     # NOT PRIVATE BECAUSE HACKERS WILL USE THAT
     def incrementSequence(self):
-        print("DATA: ",self.decodedData)
-        print(self.dict['sqNum'])
-        print(self.decodedData[self.dict['sqNum']])
         self.decodedData[self.dict['sqNum']].add(1)
 
      # NOT PRIVATE BECAUSE HACKERS WILL USE THAT
@@ -43,7 +49,8 @@ class GoosePackage:
         self.decodedData[self.dict['sqNum']].to(0)
         self.__setTime()
 
-    
+    def setTimeToLive(self):
+        self.decodedData[self.dict['timeAllowedToLive']].to(12)
 
     # Verify if the package is still able to be received
     def verifyAllowed(self):
@@ -56,20 +63,47 @@ class GoosePackage:
     def spoof(self):
         for content in self.decodedData:
             content.spoof()
-        return self.decodedData
+        return True
 
-     def semantic(self):
+    def semantic(self):
+        res = False
+        if self.lastState:
+            print("STATE", self.lastState != self.decodedData[self.dict['stNum']].getData())
+            if self.lastState != self.decodedData[self.dict['stNum']].getData():
+                res = True
+        if self.lastState == None:
+            res = True
+        self.lastState = self.decodedData[self.dict['stNum']].getData()
+        self.decodedData = self.firstPackage
+        return res
+
+    def highSequence(self):
+        isSameSt = self.decodedData[self.dict['stNum']] == self.firstPackage[self.dict['stNum']]
+        isSameSq = self.decodedData[self.dict['sqNum']] == self.firstPackage[self.dict['sqNum']]
+
+        if isSameSt and isSameSq:
+            self.decodedData[self.dict['sqNum']].to(4294967295 - 15)
+        
+        self.decodedData = self.firstPackage
+        return False
+
+    def highState(self):
+        isSameSt = self.decodedData[self.dict['stNum']] == self.firstPackage[self.dict['stNum']]
+        isSameSq = self.decodedData[self.dict['sqNum']] == self.firstPackage[self.dict['sqNum']]
+
+        self.decodedData = self.firstPackage
+
+        if isSameSt and isSameSq:
+            self.firstPackage[self.dict['stNum']].to(4294967295 - 2)
+            self.firstPackage[self.dict['sqNum']].to(0)
+            return True
+        else:
+            return False
+
+    def flooding(self):
         raise NotImplemented()
 
-    #  def highSequence(self):
-    #     raise NotImplemented()
-    
-    #  def highState(self):
-    #     raise NotImplemented()
-    
-    #  def flooding(self):
-    #     raise NotImplemented()
-
+    # def hack()
 
     # Get all package params in a form to be used by Scapy
     def mountPackage(self):
@@ -97,7 +131,6 @@ class GoosePackage:
                 leng = struct.pack('!BB', 129, len(packed_data))
                 size = struct.pack('!B', 0x82) 
             k = struct.pack('!B', 97)
-            print(k, size, leng)
             res = bytearray()
             res.extend(self.appId)
             res.extend((len(packed_data) + 10).to_bytes(2))
@@ -141,12 +174,6 @@ class GoosePackage:
 
         bytes_pdu_length = load[0] & 0x03
         load = load[1:]
-        if bytes_pdu_length == 1:
-            print("1 byte")
-        elif bytes_pdu_length == 2:
-            print("2 bytes")
-        else:
-            print("Bytes: ", bytes_pdu_length)
         
 
         pdu_length = load[0:bytes_pdu_length]
@@ -172,6 +199,8 @@ class GoosePackage:
         for index, item in enumerate(self.decodedData):
             self.dict[item.name] = index
 
+        if not self.firstPackage:
+            self.firstPackage = self.decodedData
         # print(self."appid: ", appid)
         # print("length: ", length)
         # print("reserved1: ", reserved1)

@@ -14,14 +14,17 @@ class ASNType(object):
     def pack(self, data):
         raise NotImplemented()
 
-    def spoof(self):
+    def spoof(self, data = False):
         return self.data
 
     def __str__(self):
-        return str(self.data)
+        return self.data
 
     def __repr__(self):
-        return str(self.data)
+        return self.data
+    
+    def getData(self):
+        return self.data
 
 class Integer(ASNType):
     def __init__(self, data='', length=0):
@@ -35,7 +38,7 @@ class Integer(ASNType):
             elif self.data <= 65535:
                 return struct.pack('!h', self.data)
             else:
-                return struct.pack('!i', self.data)
+                return self.data.to_bytes(5)
         if isinstance(self.data, long):
             return struct.pack('!l', self.data)
 
@@ -101,11 +104,14 @@ class UnsignedInteger(ASNType):
 
 class Float(ASNType):
     def __init__(self, data='', length=0):
-        self.data = struct.unpack('!f', data)[0]
+        self.data = struct.unpack('f', data[1:])[0]
 
     def pack(self):
-        return struct.data('!f', data) 
-
+        
+        res = bytearray()
+        res.extend((8).to_bytes(1))
+        res.extend(struct.pack('f', self.data))
+        return res
 class Real(Float):
     pass
 
@@ -116,22 +122,22 @@ class OctetString(ASNType):
 class BitString(ASNType):
     ID = 4
     def __init__(self, data='', length=0):
-        c = {'0': '0000', '1': '0001', '2': '0010', 
-             '3':'0011', '4':'0100', '5':'0101', 
-             '6':'0110', '7':'0111', '8':'1000', 
-             '9':'1001', 'a':'1010', 'b':'1011', 
-             'c':'1100', 'd':'1101', 'e':'1110', 
-             'f':'1111'}
-        self.padding = struct.unpack('!h', '\x00'+data[:1])[0]
-        h = binascii.b2a_hex(data[1:])
-        self.data = ''
-        for i in h:
-            self.data += c[i]
+        k = bytearray()
+        k.extend(data)
+        self.padding = k[0]
+        self.value = k[1]
+
+        self.data = data
 
     def pack(self):
-        packed_padding = struct.pack('!B', self.padding)
-        packed_data = struct.pack('!h', int(self.data, 2))
-        return packed_padding + packed_data
+        res = bytearray()
+        res.extend(self.padding.to_bytes(1))
+        res.extend(self.value.to_bytes(1))
+        return res
+    
+    def spoof(self, allData = False):
+        if allData:
+            self.value = self.value ^ (2**8 - 2**self.padding)
 
 class ObjectID(ASNType):
     pass
@@ -172,7 +178,6 @@ class Data(object):
         packed_data = bytearray()
             # packed_data = ''
         for content in self.data:
-            print("CONT", content)
             tag = struct.pack('!B', content.tag)
             package = content.pack()
             if len(package) < 128:

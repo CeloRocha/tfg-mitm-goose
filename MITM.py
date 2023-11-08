@@ -8,27 +8,37 @@ IFACE = "Ethernet"
 FILTER = "ether proto 35000"
 
 class MITM:
-    def __init__(self):
+    def __init__(self, type=0):
         self.publisher = Publisher()
         self.subscriber = Subscriber(DESTINATION, TYPE, IFACE, FILTER, self.callback)
-        self.ignore = False
+        self.type = type
 
     def callback(self, packet):
         print(packet)
-        if self.ignore:
-            return
-        # encoded_array = bytearray(raw(packet[Ether].payload.load))
-
-        # hex_array : str = []
-        # for byte in encoded_array:
-        #     hex_array.append(hex(byte))
 
         package = self.subscriber.getPackage()
         package.decodePackage(packet.load)
-        package.spoof()
+
+        isEvent = False
+
+        if self.type == 0:
+            isEvent = package.spoof()
+        elif self.type == 1:
+            isEvent = package.highSequence()
+        elif self.type == 2:
+            isEvent = package.highState()
+        elif self.type == 3:
+            isEvent = package.semantic()
+
         self.publisher.setPackage(package)
-        self.ignore = True
-        self.publisher.publishEvent()
+
+        if isEvent:
+            self.publisher.publishEvent()
+        else:
+            self.publisher.publish()
     
     def sniff(self):
-        self.subscriber.sniff()
+        while True:
+            self.subscriber.sniff()
+            if self.type == 0 or self.type == 1:
+                break
