@@ -7,6 +7,7 @@ import random
 class ASNType(object):
     tag = ''
     def __init__(self, data='', length=0):
+        self.data = data
         pass
 
     def unpack(self, data):
@@ -129,6 +130,12 @@ class Float(ASNType):
             x.extend(random.randint(0, 255).to_bytes(1))
             self.data = int.from_bytes(x, 'big')
 
+class Real(Float):
+    pass
+
+class OctetString(ASNType):
+    def __init__(self, data='', length=0):
+        self.data = struct.unpack('!d', data)[0]
 
 class BitString(ASNType):
     ID = 4
@@ -150,6 +157,17 @@ class BitString(ASNType):
         if allData:
             self.value = self.value ^ (2**8 - 2**self.padding)
 
+class ObjectID(ASNType):
+    pass
+
+class BCD(ASNType):
+    pass
+
+class BooleanArray(ASNType):
+    pass
+
+class UTF8String(ASNType):
+    pass
     
 class Data(object):
     tag = ''
