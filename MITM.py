@@ -5,7 +5,7 @@ from scapy.all import *
 DESTINATION = "01:0c:cd:01:00:33"
 TYPE = 35000
 IFACE = "Ethernet"
-FILTER = "vlan && ether proto 35000 || ether proto 35000"
+FILTER = "ether proto 35000"
 
 class MITM:
     def __init__(self, type=0):
@@ -15,7 +15,6 @@ class MITM:
 
     def callback(self, packet):
         print(packet)
-
         
         package = self.subscriber.getPackage()
         package.setSource(packet[Ether].src)
