@@ -13,6 +13,6 @@ signal.signal(signal.SIGINT, signal_handler)
 # High Sequence: 1
 # High State: 2
 # Semantic: 3
-mitm = MITM(0)
+mitm = MITM(2)
 print("RUN")
 mitm.sniff()

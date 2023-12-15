@@ -1,6 +1,7 @@
 from Publisher import Publisher
 from Subscriber import Subscriber
 from scapy.all import *
+from HackedGoosePackage import HackedGoosePackage
 
 DESTINATION = "01:0c:cd:01:00:33"
 TYPE = 35000
@@ -11,6 +12,7 @@ class MITM:
     def __init__(self, type=0):
         self.publisher = Publisher()
         self.subscriber = Subscriber(DESTINATION, TYPE, IFACE, FILTER, self.callback)
+        self.subscriber.setPackage(HackedGoosePackage())
         self.type = type
 
     def callback(self, packet):
